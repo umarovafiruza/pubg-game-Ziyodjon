@@ -15,9 +15,11 @@
 html, body {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: #050b14;
     color: #fff;
+    touch-action: manipulation;
 }
 
 /* Asosiy konteyner */
@@ -29,8 +31,10 @@ html, body {
     align-items: center;
     width: 100vw;
     height: 100vh;
-    padding: 8px 14px;
+    height: 100dvh;
+    padding: 6px 10px;
     background: transparent;
+    overflow: hidden;
 }
 
 /* HUD - YUQORI MA'LUMOTLAR PANELI */
@@ -188,6 +192,7 @@ html, body {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
     border: 2px solid rgba(64, 153, 255, 0.3);
     cursor: crosshair;
+    touch-action: none;
 }
 
 #gameCanvas {
@@ -536,33 +541,81 @@ kbd {
 
 /* MODAL EKRANLAR (OVERLAY SCREENS) */
 .overlay-screen {
-    position: absolute;
-    inset: 0;
-    background: rgba(2, 6, 14, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: rgba(2, 6, 14, 0.93);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     justify-content: center;
-    align-items: center;
-    z-index: 50;
-    padding: 15px;
+    align-items: flex-start; /* CRITICAL FOR MOBILE: ensures top of modal is never clipped */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    z-index: 100;
+    padding: 16px 12px 60px 12px;
+    box-sizing: border-box;
     transition: opacity 0.3s ease;
 }
 
+/* Custom sleek scrollbar for modals */
+.overlay-screen::-webkit-scrollbar {
+    width: 6px;
+}
+.overlay-screen::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+.overlay-screen::-webkit-scrollbar-thumb {
+    background: rgba(0, 229, 255, 0.5);
+    border-radius: 4px;
+}
+
 .overlay-screen.hidden {
-    display: none;
+    display: none !important;
 }
 
 .dialog-card {
     background: linear-gradient(145deg, #0e223b, #071324);
     border: 2px solid #3a75b2;
     border-radius: 20px;
-    padding: 28px 36px;
+    padding: 24px 30px;
     max-width: 680px;
     width: 100%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(33, 150, 243, 0.25);
     text-align: center;
     animation: cardAppear 0.4s ease-out;
+    margin: auto; /* Vertically centers when fits, starts at top and scrolls smoothly when tall! */
+    position: relative;
+    box-sizing: border-box;
+}
+
+.quick-start-wrapper {
+    margin: 12px 0 16px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-quick-start {
+    width: 100%;
+    max-width: 380px;
+    padding: 12px 24px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff9100, #ff3d00);
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
+    border-radius: 12px;
+    animation: pulseQuickBtn 2s infinite ease-in-out;
+}
+
+@keyframes pulseQuickBtn {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
 }
 
 @keyframes cardAppear {
@@ -1168,19 +1221,479 @@ kbd {
     font-size: 0.85rem;
 }
 
-/* Responsiv moslashuv */
-@media (max-width: 900px) {
-    .quiz-options-grid {
-        grid-template-columns: 1fr;
+/* ==========================================================
+   MOBILE TELEFONLAR UCHUN MAXSUS TOUCH BOSHQARUV TIZIMI
+   ========================================================== */
+.mobile-controls {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 22;
+}
+
+.mobile-controls.hidden {
+    display: none !important;
+}
+
+/* Virtual Joystick */
+.joystick-zone {
+    position: absolute;
+    bottom: 22px;
+    left: 20px;
+    width: 128px;
+    height: 128px;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.joystick-base {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14, 34, 59, 0.6) 0%, rgba(5, 15, 30, 0.8) 100%);
+    border: 2px solid rgba(0, 229, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.joystick-base::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.joystick-thumb {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00e5ff 0%, #0288d1 75%, #01579b 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    will-change: transform;
+    transform: translate(0px, 0px);
+}
+
+/* O'ng tomon Action tugmalari */
+.mobile-actions-wrapper {
+    position: absolute;
+    bottom: 16px;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+    z-index: 23;
+}
+
+.touch-btn {
+    pointer-events: auto;
+    touch-action: none;
+    border: none;
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.08s ease, filter 0.08s ease, background 0.15s ease;
+}
+
+.touch-btn:active {
+    transform: scale(0.92);
+    filter: brightness(1.25);
+}
+
+/* Katta O't Ochish Tugmasi (Fire Button) */
+.btn-fire {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff5722 0%, #d84315 70%, #bf360c 100%);
+    border: 2.5px solid #ffab91;
+    box-shadow: 0 0 25px rgba(255, 87, 34, 0.8), 0 4px 12px rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    position: relative;
+}
+
+.btn-fire .touch-btn-icon {
+    font-size: 1.55rem;
+    line-height: 1;
+}
+
+.btn-fire .touch-btn-label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    margin-top: 1px;
+}
+
+.btn-fire-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(255, 171, 145, 0.5);
+    animation: rotateRing 8s linear infinite;
+}
+
+@keyframes rotateRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Yumaloq Sakrash va Amal tugmalari */
+.action-btn-row {
+    display: flex;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.btn-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00b0ff 0%, #0277bd 80%);
+    border: 2px solid #80d8ff;
+    box-shadow: 0 0 14px rgba(0, 176, 255, 0.5), 0 3px 8px rgba(0,0,0,0.6);
+    color: #fff;
+}
+
+.btn-circle .touch-btn-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.btn-circle .touch-btn-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+
+/* Amal (E) Tugmasi */
+.btn-action {
+    background: radial-gradient(circle, #ffd600 0%, #ff8f00 80%);
+    border-color: #fff9c4;
+    color: #000;
+    box-shadow: 0 0 16px rgba(255, 214, 0, 0.6), 0 3px 8px rgba(0,0,0,0.6);
+}
+
+.btn-action.active-pulse {
+    animation: pulseActionBtn 1s infinite alternate ease-in-out;
+}
+
+@keyframes pulseActionBtn {
+    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 214, 0, 0.6); }
+    100% { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 214, 0, 1); }
+}
+
+/* Kichik Yordamchi Tugmalar (O'qlash, Cho'pak, Yugurish) */
+.action-btn-row-sub {
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.btn-sub {
+    background: rgba(10, 25, 47, 0.88);
+    backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(64, 153, 255, 0.45);
+    border-radius: 9px;
+    padding: 6px 8px;
+    min-width: 52px;
+    color: #e0e0e0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+.btn-sub .touch-btn-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.btn-sub .touch-btn-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
+.btn-sprint.active {
+    background: linear-gradient(135deg, #00c853, #1b5e20);
+    border-color: #69f0ae;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(0, 230, 118, 0.7);
+}
+
+/* Parvoz va Transport maxsus barlari */
+.mobile-flight-bar, .mobile-vehicle-bar {
+    position: absolute;
+    top: 55px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+    z-index: 23;
+}
+
+.btn-flight {
+    background: linear-gradient(135deg, rgba(2, 119, 189, 0.9), rgba(1, 87, 155, 0.9));
+    border: 1.5px solid #00e5ff;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+}
+
+.btn-vehicle {
+    background: linear-gradient(135deg, rgba(230, 81, 0, 0.9), rgba(191, 54, 12, 0.9));
+    border: 1.5px solid #ffb74d;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+}
+
+/* ==========================================================
+   RESPONSIV MOSLASHUV (TELEFONLAR VA PLANSHETLAR)
+   ========================================================== */
+@media (max-width: 768px) {
+    .game-wrapper {
+        padding: 4px 6px;
+    }
+
+    /* HUD mobile strip */
+    .hud-panel {
+        padding: 4px 6px;
+        gap: 4px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        margin-bottom: 2px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+    }
+    .hud-panel::-webkit-scrollbar {
+        display: none;
+    }
+    .hud-item {
+        padding: 3px 6px;
+        gap: 4px;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+    .hud-label {
+        font-size: 0.65rem;
+    }
+    .hud-value {
+        font-size: 0.82rem;
+    }
+    .hearts {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+    .weapon-hud-box {
+        padding: 3px 6px;
+    }
+    .ammo-display {
+        font-size: 0.82rem;
+        padding: 1px 4px;
+        min-width: 44px;
+    }
+    .weapon-name {
+        display: none;
+    }
+
+    /* Radar mobile scale */
+    .radar-wrapper {
+        top: 44px;
+        right: 6px;
+        width: 86px;
+        height: 86px;
+        border-width: 1.5px;
+    }
+    .radar-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .radar-label {
+        font-size: 0.58rem;
+    }
+
+    /* Weapon slots bar on mobile */
+    .weapon-slots-bar {
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 3px 6px;
+        gap: 4px;
+        max-width: 96vw;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    .weapon-slots-bar::-webkit-scrollbar {
+        display: none;
+    }
+    .weapon-slot {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+    .slot-num {
+        display: none;
+    }
+
+    /* Modals dialog cards on mobile */
+    .dialog-card {
+        padding: 16px 14px;
+        border-radius: 14px;
+        margin: 10px auto 40px auto;
+    }
+    .dialog-card h1 {
+        font-size: 1.35rem;
+        line-height: 1.25;
+    }
+    .dialog-card h2 {
+        font-size: 1.22rem;
+    }
+    .subtitle {
+        font-size: 0.82rem;
+        margin-bottom: 10px;
+    }
+    .story-box {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        margin-bottom: 12px;
     }
     .features-grid {
         grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
     }
+    .feat {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        gap: 8px;
+    }
+    .feat-icon {
+        font-size: 1.2rem;
+    }
+    .btn-large {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    /* Quiz card mobile */
+    .quiz-card {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+    .quiz-title {
+        font-size: 1.25rem;
+    }
+    .quiz-flag-visual {
+        font-size: 3rem;
+    }
+    .quiz-question-text {
+        font-size: 1.1rem;
+    }
+    .quiz-options-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .quiz-opt-btn {
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+
+    /* Hide keyboard footer on mobile */
+    .footer-help {
+        display: none !important;
+    }
+
+    /* Tree status & Airdrop alerts mobile sizing */
+    .tree-status {
+        top: 48px;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        max-width: 90vw;
+    }
+    .airdrop-alert {
+        top: 50px;
+        font-size: 0.78rem;
+        padding: 6px 14px;
+        max-width: 90vw;
+    }
+
+    /* Lock prompt: always hide on mobile */
+    .lock-prompt {
+        display: none !important;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 500px) and (orientation: landscape) {
     .hud-panel {
-        padding: 5px 10px;
-        font-size: 0.85rem;
+        padding: 2px 6px;
+        font-size: 0.65rem;
     }
-    .dialog-card {
-        padding: 20px;
+    .joystick-zone {
+        bottom: 10px;
+        left: 10px;
+        width: 105px;
+        height: 105px;
+    }
+    .joystick-base {
+        width: 95px;
+        height: 95px;
+    }
+    .joystick-thumb {
+        width: 42px;
+        height: 42px;
+    }
+    .mobile-actions-wrapper {
+        bottom: 8px;
+        right: 10px;
+        gap: 6px;
+    }
+    .btn-fire {
+        width: 58px;
+        height: 58px;
+    }
+    .btn-circle {
+        width: 44px;
+        height: 44px;
+    }
+    .weapon-slots-bar {
+        bottom: 4px;
+    }
+    .radar-wrapper {
+        width: 72px;
+        height: 72px;
+        top: 36px;
     }
 }

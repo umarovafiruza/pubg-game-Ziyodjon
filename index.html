@@ -2,7 +2,10 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>3D Xazina Topish - Katta Orol va Daraxtlar (Realistic FPS)</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -138,9 +141,69 @@
 
             <!-- Ekranda vaqtinchalik xabarlar -->
             <div id="gameNotification" class="game-notification hidden"></div>
+
+            <!-- Mobile Telefonlar uchun Maxsus Boshqaruv Paneli (Virtual Joystick & Touch Action Buttons) -->
+            <div id="mobileControls" class="mobile-controls hidden">
+                <!-- Virtual Joystick (Chap pastki burchak) -->
+                <div id="joystickZone" class="joystick-zone">
+                    <div id="joystickBase" class="joystick-base">
+                        <div id="joystickThumb" class="joystick-thumb"></div>
+                    </div>
+                </div>
+
+                <!-- O'ng tomon: Asosiy Hujum va Harakat Tugmalari -->
+                <div class="mobile-actions-wrapper">
+                    <!-- Katta O't Ochish / Zarba Tugmasi -->
+                    <button id="btnTouchFire" class="touch-btn btn-fire" title="Otish / Urish">
+                        <span class="btn-fire-ring"></span>
+                        <span class="touch-btn-icon">🎯</span>
+                        <span class="touch-btn-label">OTISH</span>
+                    </button>
+
+                    <!-- Yuqori qator: Sakrash va Amal (E) -->
+                    <div class="action-btn-row">
+                        <button id="btnTouchJump" class="touch-btn btn-circle btn-jump" title="Sakrash">
+                            <span class="touch-btn-icon">🦘</span>
+                            <span class="touch-btn-label">SAKRASH</span>
+                        </button>
+                        <button id="btnTouchAction" class="touch-btn btn-circle btn-action" title="Amal [E]">
+                            <span class="touch-btn-icon">⚡</span>
+                            <span class="touch-btn-label" id="btnActionText">AMAL</span>
+                        </button>
+                    </div>
+
+                    <!-- Pastki qator: O'qlash, Cho'pak, Yugurish -->
+                    <div class="action-btn-row-sub">
+                        <button id="btnTouchReload" class="touch-btn btn-sub btn-reload" title="O'qlash [R]">
+                            <span class="touch-btn-icon">🔄</span>
+                            <span class="touch-btn-label">O'QLASH</span>
+                        </button>
+                        <button id="btnTouchThrow" class="touch-btn btn-sub btn-throw" title="Cho'pak [Q]">
+                            <span class="touch-btn-icon">🪵</span>
+                            <span class="touch-btn-label">CHO'PAK</span>
+                        </button>
+                        <button id="btnTouchSprint" class="touch-btn btn-sub btn-sprint" title="Yugurish [Shift]">
+                            <span class="touch-btn-icon">🏃</span>
+                            <span class="touch-btn-label" id="btnSprintText">YUGUR</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parvoz holatidagi maxsus tugmalar (Balandlashish va Sho'ng'ish) -->
+                <div id="mobileFlightControls" class="mobile-flight-bar hidden">
+                    <button id="btnFlightPitchUp" class="touch-btn btn-flight" title="Balandlashish">▲ KO'TARILISH</button>
+                    <button id="btnFlightPitchDown" class="touch-btn btn-flight" title="Sho'ng'ish">▼ SHO'NG'ISH</button>
+                </div>
+
+                <!-- Transport holatidagi maxsus tugmalar (Signal va Tushish) -->
+                <div id="mobileVehicleControls" class="mobile-vehicle-bar hidden">
+                    <button id="btnVehicleHorn" class="touch-btn btn-vehicle" title="Signal [H]">📢 SIGNAL</button>
+                    <button id="btnVehicleExit" class="touch-btn btn-vehicle" title="Tushish [E]">🚪 TUSHISH</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Boshqaruv qo'llanmasi -->
+        <!-- Boshqaruv qo'llanmasi (Kompyuter uchun) -->
         <footer class="footer-help">
             <div class="help-item"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Harakat</div>
             <div class="help-item"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Qurollar</div>
@@ -160,6 +223,10 @@
                     <span class="badge">🔥 REALISTIC 3D OPEN WORLD BATTLE ROYALE</span>
                     <h1>PUBG BATTLE ROYALE & KATTA TOG'LAR 3D</h1>
                     <p class="subtitle">Tracker SUV, tezkor mototsikl, M416 avtomati, harbiy samalyot va airdroplar bilan ulkan tog'li orolni zabt eting!</p>
+                    <!-- Telefonlar uchun tezkor boshlash tugmasi -->
+                    <div class="quick-start-wrapper">
+                        <button id="quickStartBtn" class="btn btn-primary btn-quick-start">🔥 O'YINNI BOSHLASH (START)</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="story-box">

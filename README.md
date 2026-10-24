@@ -87,3 +87,4 @@ Yoki to'g'ridan-to'g'ri `index.html` faylini istalgan zamonaviy veb-brauzerda oc
 - **Three.js**: 3D grafika, relyef (heightmap), yoritish va soyalar.
 - **Web Audio API**: Realistik o'q ovozlari, samalyot va transport dvigatellari, portlashlar.
 - **HTML5 & CSS3**: Zamonaviy shaffof shisha (glassmorphism) uslubidagi HUD panellari.
+- **Mobile Touch Engine**: Smartfon va planshetlar uchun Virtual Joystick, 360° sensorli kamera, tezkor o't ochish, sakrash va dinamik interaktiv boshqaruv paneli.

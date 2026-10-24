@@ -100,11 +100,45 @@ let collectedKeys = 0;
 const totalKeysNeeded = 3;
 let buggyFuel = 100;
 let isDriving = false;
-let drivingVehicleType = null; // 'tracker' | 'moto' | null
+let drivingVehicleType = null; // 'tracker' | 'moto' | 'plane' | null
 let gameRunning = false;
 let isPointerLocked = false;
 let soundEnabled = true;
 let notificationTimeout = null;
+
+// Mobile telefonlar va sensorli ekranlar uchun holatlar
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
+const joystickVector = { x: 0, y: 0 };
+let joystickTouchId = null;
+let cameraTouchId = null;
+let lastCameraTouchX = 0;
+let lastCameraTouchY = 0;
+let isTouchFiring = false;
+let isTouchSprintActive = false;
+let isTouchJumping = false;
+let isTouchFlightPitchUp = false;
+let isTouchFlightPitchDown = false;
+
+// Mobile DOM elementlari
+const mobileControls = document.getElementById('mobileControls');
+const joystickZone = document.getElementById('joystickZone');
+const joystickBase = document.getElementById('joystickBase');
+const joystickThumb = document.getElementById('joystickThumb');
+const btnTouchFire = document.getElementById('btnTouchFire');
+const btnTouchJump = document.getElementById('btnTouchJump');
+const btnTouchAction = document.getElementById('btnTouchAction');
+const btnActionText = document.getElementById('btnActionText');
+const btnTouchReload = document.getElementById('btnTouchReload');
+const btnTouchThrow = document.getElementById('btnTouchThrow');
+const btnTouchSprint = document.getElementById('btnTouchSprint');
+const btnSprintText = document.getElementById('btnSprintText');
+const mobileFlightControls = document.getElementById('mobileFlightControls');
+const btnFlightPitchUp = document.getElementById('btnFlightPitchUp');
+const btnFlightPitchDown = document.getElementById('btnFlightPitchDown');
+const mobileVehicleControls = document.getElementById('mobileVehicleControls');
+const btnVehicleHorn = document.getElementById('btnVehicleHorn');
+const btnVehicleExit = document.getElementById('btnVehicleExit');
+const quickStartBtn = document.getElementById('quickStartBtn');
 
 // PUBG Qurollar tizimi (Kengaytirilgan Arsenal)
 let activeWeapon = 'rifle'; // 'sword' | 'rifle' | 'ak47' | 'sniper' | 'shotgun' | 'stick'
@@ -2988,14 +3022,21 @@ function updatePilotAirplane(delta) {
     let throttle = 0;
     if (keysDown['KeyW'] || keysDown['ArrowUp']) throttle += 1;
     if (keysDown['KeyS'] || keysDown['ArrowDown']) throttle -= 0.8;
+    throttle += joystickVector.y;
 
     let steer = 0;
     if (keysDown['KeyA'] || keysDown['ArrowLeft']) steer += 1;
     if (keysDown['KeyD'] || keysDown['ArrowRight']) steer -= 1;
+    steer -= joystickVector.x;
 
     let pitchInput = 0;
-    if (keysDown['Space']) pitchInput += 1; // Ko'tarilish (Pitch Up)
-    if (keysDown['ShiftLeft'] || keysDown['ShiftRight']) pitchInput -= 1; // Pastga sho'ng'ish (Pitch Down)
+    if (keysDown['Space'] || isTouchFlightPitchUp) pitchInput += 1; // Ko'tarilish (Pitch Up)
+    if (keysDown['ShiftLeft'] || keysDown['ShiftRight'] || isTouchFlightPitchDown) pitchInput -= 1; // Pastga sho'ng'ish (Pitch Down)
+
+    // Mobile ekranda otish bosib turilganda havo to'plaridan uzluksiz otish
+    if (isTouchFiring && gameRunning) {
+        triggerAirplaneCannons();
+    }
 
     // Dvigatel gazini boshqarish
     if (throttle > 0 && buggyFuel > 0) {
@@ -3190,14 +3231,74 @@ const playerVelocity = new THREE.Vector3();
 let isGrounded = true;
 let runCycle = 0;
 
+function performActionE() {
+    if (isDriving) {
+        exitVehicle();
+        return;
+    }
+
+    let handled = false;
+
+    // 1. Uylardagi qurollar va aptechkalarni olish (House Loot)
+    for (const loot of houseLootPickups) {
+        if (!loot.looted && playerPos.distanceTo(loot.position) < 2.8) {
+            lootHouseItem(loot);
+            handled = true;
+            break;
+        }
+    }
+
+    // 2. Uchuvchi Samalyotga o'tirish (Flyable Airplane)
+    if (!handled && pilotPlaneVehicle && playerPos.distanceTo(pilotPlaneVehicle.position) < 4.8) {
+        enterVehicle('plane');
+        handled = true;
+    }
+
+    // 3. Tracker SUV minish
+    if (!handled && trackerVehicle && playerPos.distanceTo(trackerVehicle.position) < 3.8) {
+        enterVehicle('tracker');
+        handled = true;
+    }
+    // 4. Mototsikl minish
+    else if (!handled && motoVehicle && playerPos.distanceTo(motoVehicle.position) < 3.4) {
+        enterVehicle('moto');
+        handled = true;
+    }
+    // 5. Airdrop qutisini ochish
+    else if (!handled) {
+        for (const crate of airdropCrates) {
+            if (!crate.looted && playerPos.distanceTo(crate.group.position) < 4.2) {
+                lootAirdrop(crate);
+                handled = true;
+                break;
+            }
+        }
+    }
+
+    // 6. Xazina sandig'ini ochish
+    if (!handled && chestObject && !chestUnlocked && playerPos.distanceTo(chestObject.position) < 3.8) {
+        tryOpenChest();
+        handled = true;
+    }
+
+    // Agar hech narsa bo'lmasa va cho'pak quroli bo'lsa otish
+    if (!handled && activeWeapon === 'stick') {
+        throwStick();
+    }
+}
+
 function setupControls() {
     canvasContainer.addEventListener('click', () => {
-        if (!isPointerLocked && gameRunning) {
+        if (!isTouchDevice && !isPointerLocked && gameRunning) {
             canvasContainer.requestPointerLock();
         }
     });
 
     document.addEventListener('pointerlockchange', () => {
+        if (isTouchDevice) {
+            if (lockPrompt) lockPrompt.classList.add('hidden');
+            return;
+        }
         isPointerLocked = (document.pointerLockElement === canvasContainer);
         if (lockPrompt) {
             if (isPointerLocked || !gameRunning) lockPrompt.classList.add('hidden');
@@ -3267,58 +3368,7 @@ function setupControls() {
 
         // E TUGMASI: Minish, Tushish, Airdrop ochish, Uylardan qurol olish, Sandiq ochish
         if (e.code === 'KeyE') {
-            if (isDriving) {
-                exitVehicle();
-            } else {
-                let handled = false;
-
-                // 1. Uylardagi qurollar va aptechkalarni olish (House Loot)
-                for (const loot of houseLootPickups) {
-                    if (!loot.looted && playerPos.distanceTo(loot.position) < 2.8) {
-                        lootHouseItem(loot);
-                        handled = true;
-                        break;
-                    }
-                }
-
-                // 2. Uchuvchi Samalyotga o'tirish (Flyable Airplane)
-                if (!handled && pilotPlaneVehicle && playerPos.distanceTo(pilotPlaneVehicle.position) < 4.8) {
-                    enterVehicle('plane');
-                    handled = true;
-                }
-
-                // 3. Tracker SUV minish
-                if (!handled && trackerVehicle && playerPos.distanceTo(trackerVehicle.position) < 3.8) {
-                    enterVehicle('tracker');
-                    handled = true;
-                }
-                // 4. Mototsikl minish
-                else if (!handled && motoVehicle && playerPos.distanceTo(motoVehicle.position) < 3.4) {
-                    enterVehicle('moto');
-                    handled = true;
-                }
-                // 5. Airdrop qutisini ochish
-                else if (!handled) {
-                    for (const crate of airdropCrates) {
-                        if (!crate.looted && playerPos.distanceTo(crate.group.position) < 4.2) {
-                            lootAirdrop(crate);
-                            handled = true;
-                            break;
-                        }
-                    }
-                }
-
-                // 6. Xazina sandig'ini ochish
-                if (!handled && chestObject && !chestUnlocked && playerPos.distanceTo(chestObject.position) < 3.8) {
-                    tryOpenChest();
-                    handled = true;
-                }
-
-                // Agar hech narsa bo'lmasa va cho'pak quroli bo'lsa otish
-                if (!handled && activeWeapon === 'stick') {
-                    throwStick();
-                }
-            }
+            performActionE();
         }
 
         if (e.code === 'KeyQ') throwStick();
@@ -3340,10 +3390,299 @@ function setupControls() {
     if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
     if (startBtn) startBtn.addEventListener('click', startGame);
+    if (quickStartBtn) {
+        quickStartBtn.addEventListener('click', startGame);
+        quickStartBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startGame();
+        });
+    }
     if (nextLevelBtn) nextLevelBtn.addEventListener('click', goToNextLevel);
     if (winRestartBtn) winRestartBtn.addEventListener('click', restartFromBeginning);
     if (gameOverRestartBtn) gameOverRestartBtn.addEventListener('click', restartFromBeginning);
     if (quizGiveUpBtn) quizGiveUpBtn.addEventListener('click', () => handleQuizAnswer(-2));
+
+    // Mobile sensorli boshqaruvni ishga tushirish
+    setupMobileControls();
+}
+
+// ----------------------------------------------------------
+// 12.1. TELEFONLAR UCHUN MAXSUS TOUCH VA JOYSTICK TIZIMI
+// ----------------------------------------------------------
+function setupMobileControls() {
+    if (isTouchDevice) {
+        if (mobileControls) mobileControls.classList.remove('hidden');
+        if (lockPrompt) lockPrompt.classList.add('hidden');
+    }
+
+    if (!joystickZone || !joystickBase || !joystickThumb) return;
+
+    // --- 1. VIRTUAL JOYSTICK BOSHQARUVI ---
+    const maxRadius = 45;
+
+    function handleJoystickMove(touch) {
+        const rect = joystickBase.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        let dx = touch.clientX - centerX;
+        let dy = touch.clientY - centerY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > maxRadius) {
+            dx = (dx / dist) * maxRadius;
+            dy = (dy / dist) * maxRadius;
+        }
+
+        joystickThumb.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        // Normalizatsiya (-1 dan +1 gacha)
+        // dy < 0 (yuqoriga tortilganda) - oldinga yurish (y > 0 bo'ladi)
+        joystickVector.x = dx / maxRadius;
+        joystickVector.y = -dy / maxRadius;
+
+        keysDown['KeyW'] = joystickVector.y > 0.35;
+        keysDown['KeyS'] = joystickVector.y < -0.35;
+        keysDown['KeyA'] = joystickVector.x < -0.35;
+        keysDown['KeyD'] = joystickVector.x > 0.35;
+    }
+
+    function resetJoystick() {
+        joystickTouchId = null;
+        joystickVector.x = 0;
+        joystickVector.y = 0;
+        joystickThumb.style.transform = 'translate(0px, 0px)';
+        keysDown['KeyW'] = false;
+        keysDown['KeyS'] = false;
+        keysDown['KeyA'] = false;
+        keysDown['KeyD'] = false;
+    }
+
+    joystickZone.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (joystickTouchId === null) {
+            const touch = e.changedTouches[0];
+            joystickTouchId = touch.identifier;
+            handleJoystickMove(touch);
+        }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        if (joystickTouchId !== null) {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === joystickTouchId) {
+                    handleJoystickMove(e.changedTouches[i]);
+                    break;
+                }
+            }
+        }
+    }, { passive: true });
+
+    const endJoystickTouch = (e) => {
+        if (joystickTouchId !== null) {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === joystickTouchId) {
+                    resetJoystick();
+                    break;
+                }
+            }
+        }
+    };
+    window.addEventListener('touchend', endJoystickTouch);
+    window.addEventListener('touchcancel', endJoystickTouch);
+
+    // --- 2. KAMERA TOUCH DRAG (EKRAN O'NG YARMI) ---
+    canvasContainer.addEventListener('touchstart', (e) => {
+        if (!gameRunning) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            const target = touch.target;
+            // Agar teginish birorta tugma yoki joystick ustida bo'lsa uni o'tkazib yuboramiz
+            if (target.closest('.touch-btn') || target.closest('.joystick-zone') || target.closest('.weapon-slot') || target.closest('.sound-btn') || target.closest('.dialog-card')) {
+                continue;
+            }
+            if (cameraTouchId === null) {
+                cameraTouchId = touch.identifier;
+                lastCameraTouchX = touch.clientX;
+                lastCameraTouchY = touch.clientY;
+                break;
+            }
+        }
+    }, { passive: true });
+
+    canvasContainer.addEventListener('touchmove', (e) => {
+        if (!gameRunning || cameraTouchId === null) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            if (touch.identifier === cameraTouchId) {
+                const dx = touch.clientX - lastCameraTouchX;
+                const dy = touch.clientY - lastCameraTouchY;
+                lastCameraTouchX = touch.clientX;
+                lastCameraTouchY = touch.clientY;
+
+                const touchSens = 0.0042;
+                cameraYaw -= dx * touchSens;
+                cameraPitch -= dy * touchSens;
+                cameraPitch = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, cameraPitch));
+                break;
+            }
+        }
+    }, { passive: true });
+
+    const handleCameraTouchEnd = (e) => {
+        if (cameraTouchId === null) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === cameraTouchId) {
+                cameraTouchId = null;
+                break;
+            }
+        }
+    };
+    canvasContainer.addEventListener('touchend', handleCameraTouchEnd);
+    canvasContainer.addEventListener('touchcancel', handleCameraTouchEnd);
+
+    // --- 3. MOBILE HARAKAT VA HUJUM TUGMALARI ---
+    if (btnTouchFire) {
+        const startFire = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            getAudioContext();
+            isTouchFiring = true;
+            if (isDriving && drivingVehicleType === 'plane') {
+                isFiringRifle = true;
+                triggerAirplaneCannons();
+            } else if (activeWeapon === 'sword') {
+                triggerSwordAttack();
+            } else if (activeWeapon === 'stick') {
+                throwStick();
+            } else {
+                isFiringRifle = true;
+                triggerRifleShot();
+            }
+        };
+        const endFire = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isTouchFiring = false;
+            isFiringRifle = false;
+        };
+        btnTouchFire.addEventListener('touchstart', startFire, { passive: false });
+        btnTouchFire.addEventListener('touchend', endFire, { passive: false });
+        btnTouchFire.addEventListener('touchcancel', endFire, { passive: false });
+        btnTouchFire.addEventListener('mousedown', startFire);
+        btnTouchFire.addEventListener('mouseup', endFire);
+    }
+
+    if (btnTouchJump) {
+        const doJump = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isTouchJumping = true;
+            keysDown['Space'] = true;
+            setTimeout(() => {
+                isTouchJumping = false;
+                keysDown['Space'] = false;
+            }, 180);
+        };
+        btnTouchJump.addEventListener('touchstart', doJump, { passive: false });
+        btnTouchJump.addEventListener('mousedown', doJump);
+    }
+
+    if (btnTouchAction) {
+        const doAction = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            performActionE();
+        };
+        btnTouchAction.addEventListener('touchstart', doAction, { passive: false });
+        btnTouchAction.addEventListener('mousedown', doAction);
+    }
+
+    if (btnTouchReload) {
+        const doReload = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            reloadRifle();
+        };
+        btnTouchReload.addEventListener('touchstart', doReload, { passive: false });
+        btnTouchReload.addEventListener('mousedown', doReload);
+    }
+
+    if (btnTouchThrow) {
+        const doThrow = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            throwStick();
+        };
+        btnTouchThrow.addEventListener('touchstart', doThrow, { passive: false });
+        btnTouchThrow.addEventListener('mousedown', doThrow);
+    }
+
+    if (btnTouchSprint) {
+        const toggleSprint = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isTouchSprintActive = !isTouchSprintActive;
+            btnTouchSprint.classList.toggle('active', isTouchSprintActive);
+            if (btnSprintText) {
+                btnSprintText.innerText = isTouchSprintActive ? "YUGUR (ON)" : "YUGUR";
+            }
+        };
+        btnTouchSprint.addEventListener('touchstart', toggleSprint, { passive: false });
+        btnTouchSprint.addEventListener('mousedown', toggleSprint);
+    }
+
+    if (btnFlightPitchUp) {
+        btnFlightPitchUp.addEventListener('touchstart', (e) => { e.preventDefault(); isTouchFlightPitchUp = true; }, { passive: false });
+        btnFlightPitchUp.addEventListener('touchend', (e) => { e.preventDefault(); isTouchFlightPitchUp = false; }, { passive: false });
+    }
+    if (btnFlightPitchDown) {
+        btnFlightPitchDown.addEventListener('touchstart', (e) => { e.preventDefault(); isTouchFlightPitchDown = true; }, { passive: false });
+        btnFlightPitchDown.addEventListener('touchend', (e) => { e.preventDefault(); isTouchFlightPitchDown = false; }, { passive: false });
+    }
+
+    if (btnVehicleHorn) {
+        btnVehicleHorn.addEventListener('touchstart', (e) => { e.preventDefault(); playCarHornSound(); }, { passive: false });
+        btnVehicleHorn.addEventListener('mousedown', (e) => { e.preventDefault(); playCarHornSound(); });
+    }
+    if (btnVehicleExit) {
+        btnVehicleExit.addEventListener('touchstart', (e) => { e.preventDefault(); exitVehicle(); }, { passive: false });
+        btnVehicleExit.addEventListener('mousedown', (e) => { e.preventDefault(); exitVehicle(); });
+    }
+
+    // Tezkor qurol almashtirish va modal tugmalarini touch bilan qulay bosish
+    document.querySelectorAll('.weapon-slot').forEach(slot => {
+        slot.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            slot.click();
+        });
+    });
+
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            toggleFullscreen();
+        });
+    }
+    if (soundToggleBtn) {
+        soundToggleBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            toggleSound();
+        });
+    }
+
+    // Savol variantlari tugmalari
+    document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            btn.click();
+        });
+    });
+
+    window.addEventListener('orientationchange', () => {
+        setTimeout(resizeRenderer, 150);
+    });
 }
 
 function enterVehicle(type) {
@@ -3447,8 +3786,8 @@ function updatePlayer(delta) {
         return;
     }
 
-    // Avtomatdan uzluksiz o'q uzish (Mouse tugmasi bosib turilganda M416 yoki AK-47)
-    if (isFiringRifle && (activeWeapon === 'rifle' || activeWeapon === 'ak47')) {
+    // Avtomatdan uzluksiz o'q uzish (Mouse yoki Mobile otish tugmasi bosib turilganda)
+    if ((isFiringRifle || isTouchFiring) && (activeWeapon === 'rifle' || activeWeapon === 'ak47')) {
         triggerRifleShot();
     }
 
@@ -3463,7 +3802,13 @@ function updatePlayer(delta) {
     if (keysDown['KeyD'] || keysDown['ArrowRight']) inputRight += 1;
     if (keysDown['KeyA'] || keysDown['ArrowLeft']) inputRight -= 1;
 
-    const isSprinting = keysDown['ShiftLeft'] || keysDown['ShiftRight'];
+    // Mobile Virtual Joystick harakati
+    if (joystickVector.y !== 0 || joystickVector.x !== 0) {
+        inputForward += joystickVector.y;
+        inputRight += joystickVector.x;
+    }
+
+    const isSprinting = keysDown['ShiftLeft'] || keysDown['ShiftRight'] || isTouchSprintActive || (joystickVector.y > 0.85);
     const baseSpeed = isSprinting ? 11.0 : 6.5;
 
     // YAQUIN DARAXTNI VA DARAXTGA CHIQISHNI TEKSHIRISH
@@ -3481,7 +3826,7 @@ function updatePlayer(delta) {
     });
 
     if (nearTree) {
-        if ((keysDown['Space'] || keysDown['KeyW']) && playerPos.y < nearTree.branchHeight) {
+        if ((keysDown['Space'] || keysDown['KeyW'] || joystickVector.y > 0.4 || isTouchJumping) && playerPos.y < nearTree.branchHeight) {
             playerVelocity.y = 7.0;
             isGrounded = false;
             currentClimbingTree = nearTree;
@@ -3489,7 +3834,7 @@ function updatePlayer(delta) {
         }
     } else if (nearTower) {
         const topY = nearTower.baseY + nearTower.height;
-        if ((keysDown['Space'] || keysDown['KeyW']) && playerPos.y < topY) {
+        if ((keysDown['Space'] || keysDown['KeyW'] || joystickVector.y > 0.4 || isTouchJumping) && playerPos.y < topY) {
             playerVelocity.y = 7.5;
             isGrounded = false;
             playFootstepSound('stone');
@@ -3596,10 +3941,11 @@ function updatePlayer(delta) {
 
     // Sakrash
     const canJump = isGrounded && (!nearTree && !nearTower || ((onPlatformTree || onTowerDeck) && playerPos.y >= (onPlatformTree ? onPlatformTree.branchHeight : onTowerDeck.baseY + onTowerDeck.height) - 0.1));
-    if (keysDown['Space'] && canJump) {
+    if ((keysDown['Space'] || isTouchJumping) && canJump) {
         playerVelocity.y = 8.5;
         isGrounded = false;
         playJumpSound();
+        isTouchJumping = false;
     }
 
     playerVelocity.y -= 22 * delta;
@@ -3692,10 +4038,12 @@ function updateVehicleDriving(delta) {
     let throttle = 0;
     if (keysDown['KeyW'] || keysDown['ArrowUp']) throttle += 1;
     if (keysDown['KeyS'] || keysDown['ArrowDown']) throttle -= 0.6;
+    throttle += joystickVector.y;
 
     let steer = 0;
     if (keysDown['KeyA'] || keysDown['ArrowLeft']) steer += 1;
     if (keysDown['KeyD'] || keysDown['ArrowRight']) steer -= 1;
+    steer -= joystickVector.x;
 
     if (throttle !== 0 && buggyFuel > 0) {
         v.velocity = (v.velocity || 0) + throttle * accel * delta;
@@ -4094,6 +4442,41 @@ function updateCollectiblesAndPrompts() {
         if (isCrossInteractive) crosshair.classList.add('interactive');
         else crosshair.classList.remove('interactive');
     }
+
+    // Mobile Action tugmasini dinamik yangilash (PUBG Mobile uslubida)
+    if (btnActionText && btnTouchAction) {
+        if (isDriving) {
+            btnActionText.innerText = (drivingVehicleType === 'plane') ? "SAKRASH" : "TUSHISH";
+            btnTouchAction.classList.add('active-pulse');
+        } else if (isCrossInteractive) {
+            if (pilotPlaneVehicle && playerPos.distanceTo(pilotPlaneVehicle.position) < 4.8) {
+                btnActionText.innerText = "UCHISH";
+            } else if ((trackerVehicle && playerPos.distanceTo(trackerVehicle.position) < 4.2) ||
+                       (motoVehicle && playerPos.distanceTo(motoVehicle.position) < 3.8)) {
+                btnActionText.innerText = "MINISH";
+            } else {
+                btnActionText.innerText = "OLISH";
+            }
+            btnTouchAction.classList.add('active-pulse');
+        } else {
+            btnActionText.innerText = "AMAL";
+            btnTouchAction.classList.remove('active-pulse');
+        }
+    }
+
+    // Mobile parvoz va transport panellarini ko'rsatish/yashirish
+    if (mobileFlightControls && mobileVehicleControls) {
+        if (isDriving && drivingVehicleType === 'plane') {
+            mobileFlightControls.classList.remove('hidden');
+            mobileVehicleControls.classList.add('hidden');
+        } else if (isDriving) {
+            mobileVehicleControls.classList.remove('hidden');
+            mobileFlightControls.classList.add('hidden');
+        } else {
+            mobileFlightControls.classList.add('hidden');
+            mobileVehicleControls.classList.add('hidden');
+        }
+    }
 }
 
 function updateRadar() {
@@ -4300,12 +4683,12 @@ function startGame() {
     stickCount = 3;
     gameRunning = true;
     buildLevel(currentLevel);
-    if (canvasContainer) canvasContainer.requestPointerLock();
+    if (!isTouchDevice && canvasContainer) canvasContainer.requestPointerLock();
 }
 
 function completeLevel() {
     gameRunning = false;
-    document.exitPointerLock();
+    if (!isTouchDevice && document.exitPointerLock) document.exitPointerLock();
     if (currentLevel >= maxLevels) showWinScreen();
     else showLevelCompleteScreen();
 }
@@ -4326,7 +4709,7 @@ function goToNextLevel() {
     playerHealth = Math.min(maxHealth, playerHealth + 1);
     gameRunning = true;
     buildLevel(currentLevel);
-    if (canvasContainer) canvasContainer.requestPointerLock();
+    if (!isTouchDevice && canvasContainer) canvasContainer.requestPointerLock();
 }
 
 function showWinScreen() {
@@ -4643,7 +5026,7 @@ function handleQuizAnswer(selectedIndex) {
             gameRunning = true;
             updateHUD();
             showNotification("To'g'ri javob berdingiz! Qayta tirildingiz va jang davom etmoqda! ❤️‍🔥");
-            if (canvasContainer) canvasContainer.requestPointerLock();
+            if (!isTouchDevice && canvasContainer) canvasContainer.requestPointerLock();
         }, 1100);
     } else {
         // NOTO'G'RI JAVOB: O'yin boshida 0 ga tushadi!
@@ -4669,7 +5052,7 @@ function handleQuizAnswer(selectedIndex) {
 
 function handleGameOver() {
     gameRunning = false;
-    document.exitPointerLock();
+    if (!isTouchDevice && document.exitPointerLock) document.exitPointerLock();
     showRevivalQuiz();
 }
 
@@ -4679,7 +5062,7 @@ function restartCurrentLevel() {
     stickCount = 3;
     gameRunning = true;
     buildLevel(currentLevel);
-    if (canvasContainer) canvasContainer.requestPointerLock();
+    if (!isTouchDevice && canvasContainer) canvasContainer.requestPointerLock();
 }
 
 function restartFromBeginning() {
@@ -4691,7 +5074,7 @@ function restartFromBeginning() {
     stickCount = 3;
     gameRunning = true;
     buildLevel(currentLevel);
-    if (canvasContainer) canvasContainer.requestPointerLock();
+    if (!isTouchDevice && canvasContainer) canvasContainer.requestPointerLock();
 }
 
 function toggleSound() {
