@@ -1,6 +1,6 @@
 /* ==========================================================
-   3D XAZINA TOPISH O'YINI - USLUBLAR (CSS)
-   Mavzu: 1-Shaxs (FPS) Realistik Grafika va Modern HUD
+   PUBG MOBILE 3D BATTLE ROYALE - MINIMALIST LANDSCAPE CSS
+   Faqat Gorizontal (Landscape) rejim, Fullscreen & Burger Menu
    ========================================================== */
 
 * {
@@ -17,180 +17,96 @@ html, body {
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    background: #050b14;
+    background: #02060f;
     color: #fff;
-    touch-action: manipulation;
+    touch-action: none;
+    overscroll-behavior: none;
 }
 
-/* Asosiy konteyner */
+/* ==========================================================
+   1. FAQAT GORIZONTAL (LANDSCAPE) REJIM BLOCKER
+   Vertikal (Portrait) ushlaganda o'yinni to'liq to'sib qo'yadi
+   ========================================================== */
+.portrait-blocker {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #0a192f 0%, #030712 100%);
+    z-index: 999999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 24px;
+    color: #ffffff;
+    box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.2);
+}
+
+/* Agar ekran vertikal bo'lsa darhol blocker chiqadi */
+@media (orientation: portrait) and (max-width: 1024px) {
+    .portrait-blocker {
+        display: flex !important;
+    }
+}
+
+.rotate-phone-anim {
+    font-size: 4.5rem;
+    margin-bottom: 16px;
+    animation: rotatePhone 2s infinite ease-in-out;
+}
+
+@keyframes rotatePhone {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(90deg) scale(1.15); }
+    100% { transform: rotate(90deg) scale(1); }
+}
+
+.portrait-blocker h2 {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #ffd600;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 15px rgba(255, 214, 0, 0.5);
+}
+
+.portrait-blocker p {
+    font-size: 1rem;
+    color: #90caf9;
+    margin-bottom: 12px;
+}
+
+.blocker-sub {
+    font-size: 0.8rem;
+    color: #78909c;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================
+   2. ASOSIY O'YIN KONTEYNERI (FULL SIZE FULL BLEED)
+   ========================================================== */
 .game-wrapper {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    padding: 6px 10px;
-    background: transparent;
     overflow: hidden;
-}
-
-/* HUD - YUQORI MA'LUMOTLAR PANELI */
-.hud-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1260px;
-    background: rgba(10, 25, 47, 0.82);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(64, 153, 255, 0.35);
-    border-radius: 14px;
-    padding: 7px 16px;
-    margin-bottom: 6px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    gap: 10px;
-    flex-wrap: wrap;
-    z-index: 25;
-}
-
-.hud-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.45);
-    padding: 5px 12px;
-    border-radius: 9px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.hud-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #90caf9;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-.level-indicator {
-    background: linear-gradient(135deg, #ff9800, #e65100);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(230, 81, 0, 0.4);
-}
-
-.level-title {
-    font-size: 0.95rem;
-    color: #ffe082;
-    font-weight: 700;
-    margin-left: 4px;
-    text-shadow: 0 0 10px rgba(255, 224, 130, 0.4);
-}
-
-.hearts {
-    font-size: 1.25rem;
-    letter-spacing: 3px;
-    filter: drop-shadow(0 2px 6px rgba(255, 20, 20, 0.6));
-    animation: pulseHeart 2s infinite ease-in-out;
-}
-
-@keyframes pulseHeart {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.hud-value {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #ffd700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
-}
-
-.hud-value .icon {
-    font-size: 1.2rem;
-}
-
-/* Mashina yoqilg'isi */
-.fuel-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.fuel-bar-container {
-    width: 90px;
-    height: 14px;
-    background: #1a1a24;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1.5px solid #ff9800;
-    position: relative;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
-}
-
-.fuel-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #ff3d00, #ffea00, #00e676);
-    border-radius: 8px;
-    transition: width 0.2s ease;
-    box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
-}
-
-.fuel-text {
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #ffe082;
-    min-width: 36px;
-}
-
-/* Boshqaruv tugmalari (Ovoz va Fullscreen) */
-.controls-box {
-    display: flex;
-    gap: 8px;
-}
-
-.sound-btn {
-    background: linear-gradient(135deg, #1976d2, #0d47a1);
-    border: 1px solid #64b5f6;
-    color: #fff;
-    font-size: 1.15rem;
-    border-radius: 9px;
-    padding: 5px 11px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 3px 10px rgba(13, 71, 161, 0.4);
-}
-
-.sound-btn:hover {
-    background: linear-gradient(135deg, #2196f3, #1565c0);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.6);
+    padding: 0;
+    margin: 0;
+    background: #000;
 }
 
 /* 3D CANVAS MAYDONI */
 .canvas-container {
-    position: relative;
-    flex: 1;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    max-width: 1260px;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 16px;
     overflow: hidden;
     background-color: #030710;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
-    border: 2px solid rgba(64, 153, 255, 0.3);
     cursor: crosshair;
     touch-action: none;
 }
@@ -202,1027 +118,267 @@ html, body {
     object-fit: cover;
 }
 
-/* Qonli jarohat overlay effekti */
-.damage-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle, transparent 40%, rgba(220, 20, 20, 0.55) 85%, rgba(180, 0, 0, 0.8) 100%);
-    opacity: 0;
-    transition: opacity 0.12s ease-out;
-    z-index: 10;
-}
-
-/* Lava qizish overlay effekti */
-.lava-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle, transparent 45%, rgba(255, 87, 34, 0.4) 85%, rgba(216, 27, 96, 0.7) 100%);
-    opacity: 0;
-    transition: opacity 0.25s ease-out;
-    z-index: 9;
-}
-
-/* 1-SHAXS NISHONI (CROSSHAIR) */
-.crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 28px;
-    height: 28px;
-    pointer-events: none;
-    z-index: 15;
-    transition: transform 0.15s ease, filter 0.15s ease;
-}
-
-.cross-dot {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 4px;
-    height: 4px;
-    background: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 0 4px #000, 0 0 8px rgba(0, 230, 255, 0.8);
-}
-
-.cross-line {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 0 3px #000;
-    border-radius: 1px;
-}
-
-.cross-top {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 7px;
-}
-
-.cross-bottom {
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 7px;
-}
-
-.cross-left {
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 2px;
-    width: 7px;
-}
-
-.cross-right {
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 2px;
-    width: 7px;
-}
-
-/* Interaktiv obyektga qaraganda nishon o'zgarishi */
-.crosshair.interactive {
-    transform: translate(-50%, -50%) scale(1.3);
-}
-
-.crosshair.interactive .cross-dot {
-    background: #ffd700;
-    box-shadow: 0 0 10px #ffd700;
-}
-
-.crosshair.interactive .cross-line {
-    background: #ffd700;
-}
-
-/* Hitmarker (Dushmanga urilganda) */
-.hit-marker {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 20px;
-    font-weight: 900;
-    color: #ff3333;
-    text-shadow: 0 0 8px #ff0000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.05s ease-out;
-}
-
-.hit-marker.active {
-    opacity: 1;
-}
-
-/* Interaktiv amal maslahati ([E] Olish) */
-.action-prompt {
-    position: absolute;
-    bottom: 35px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(14, 25, 45, 0.92);
-    border: 2px solid #ffd700;
-    border-radius: 30px;
-    padding: 8px 22px;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 1rem;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.3);
-    pointer-events: none;
-    z-index: 18;
-    animation: promptFloat 1.8s infinite ease-in-out;
-}
-
-@keyframes promptFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-}
-
-.action-key {
-    background: linear-gradient(135deg, #ffd700, #ff9100);
-    color: #000;
-    font-weight: 900;
-    font-size: 0.95rem;
-    padding: 3px 10px;
-    border-radius: 7px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* RADAR (Mini-xarita) */
-.radar-wrapper {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    background: rgba(10, 20, 35, 0.82);
-    border: 2px solid rgba(64, 153, 255, 0.5);
-    border-radius: 50%;
-    padding: 4px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 230, 255, 0.2);
-    pointer-events: none;
-    z-index: 16;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#radarCanvas {
-    display: block;
-    border-radius: 50%;
-    background: radial-gradient(circle, #0b1c31 0%, #040913 100%);
-}
-
-.radar-label {
-    position: absolute;
-    bottom: -18px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    color: #64b5f6;
-    letter-spacing: 1px;
-    text-shadow: 0 1px 4px #000;
-}
-
-/* Sichqonchani bloklash / Boshqaruvga o'tish */
-.lock-prompt {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(3, 8, 16, 0.72);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    z-index: 22;
-    cursor: pointer;
-    transition: opacity 0.25s ease;
-}
-
-.lock-prompt.hidden {
-    display: none;
-}
-
-.lock-card {
-    background: linear-gradient(135deg, rgba(20, 45, 80, 0.95), rgba(10, 25, 45, 0.95));
-    border: 2px solid #64b5f6;
-    border-radius: 18px;
-    padding: 24px 34px;
-    text-align: center;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(33, 150, 243, 0.3);
-    animation: lockPulse 2s infinite ease-in-out;
-}
-
-@keyframes lockPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-}
-
-.lock-icon {
-    font-size: 2.8rem;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.lock-card h3 {
-    font-size: 1.4rem;
-    color: #64b5f6;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-}
-
-.lock-card p {
-    font-size: 1.05rem;
-    color: #e0f2fe;
-    margin-bottom: 12px;
-}
-
-.lock-hints {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(100, 181, 246, 0.3);
-    border-radius: 10px;
-    padding: 10px 16px;
-    margin-bottom: 14px;
-    font-size: 0.88rem;
-    color: #e0f2fe;
-    text-align: left;
-}
-
-/* Daraxt tepasida turganlik indikatori */
-.tree-status {
-    position: absolute;
-    top: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(20, 60, 30, 0.92);
-    border: 2px solid #00e676;
-    border-radius: 25px;
-    padding: 8px 24px;
-    color: #ffffff;
-    font-size: 0.96rem;
-    font-weight: 700;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 230, 118, 0.5);
-    z-index: 17;
-    animation: treePulse 2s infinite ease-in-out;
-}
-
-@keyframes treePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-}
-
-.tree-icon {
-    font-size: 1.4rem;
-}
-
-.lock-sub {
-    font-size: 0.85rem;
-    color: #90caf9;
-    background: rgba(0,0,0,0.4);
-    padding: 4px 12px;
-    border-radius: 20px;
-    display: inline-block;
-}
-
-/* Vaqtinchalik bildirishnoma matni */
-.game-notification {
-    position: absolute;
-    top: 25px;
-    background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(185, 28, 28, 0.95));
-    border: 2px solid #ffffff;
-    border-radius: 12px;
-    padding: 10px 26px;
-    color: #ffffff;
-    font-weight: 800;
-    font-size: 1.05rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(239, 68, 68, 0.5);
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 24;
-}
-
-/* Pastki yordam paneli */
-.footer-help {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin-top: 6px;
-    flex-wrap: wrap;
-    font-size: 0.85rem;
-    color: #b0cfee;
-}
-
-.help-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-kbd {
-    background: linear-gradient(180deg, #1f4774, #122e4d);
-    border: 1px solid #5a91cf;
-    border-radius: 5px;
-    padding: 2px 7px;
-    font-weight: bold;
-    color: #e3f2fd;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-    font-size: 0.82rem;
-}
-
-/* MODAL EKRANLAR (OVERLAY SCREENS) */
-.overlay-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    height: 100dvh;
-    background: rgba(2, 6, 14, 0.93);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* CRITICAL FOR MOBILE: ensures top of modal is never clipped */
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    z-index: 100;
-    padding: 16px 12px 60px 12px;
-    box-sizing: border-box;
-    transition: opacity 0.3s ease;
-}
-
-/* Custom sleek scrollbar for modals */
-.overlay-screen::-webkit-scrollbar {
-    width: 6px;
-}
-.overlay-screen::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-}
-.overlay-screen::-webkit-scrollbar-thumb {
-    background: rgba(0, 229, 255, 0.5);
-    border-radius: 4px;
-}
-
-.overlay-screen.hidden {
-    display: none !important;
-}
-
-.dialog-card {
-    background: linear-gradient(145deg, #0e223b, #071324);
-    border: 2px solid #3a75b2;
-    border-radius: 20px;
-    padding: 24px 30px;
-    max-width: 680px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(33, 150, 243, 0.25);
-    text-align: center;
-    animation: cardAppear 0.4s ease-out;
-    margin: auto; /* Vertically centers when fits, starts at top and scrolls smoothly when tall! */
-    position: relative;
-    box-sizing: border-box;
-}
-
-.quick-start-wrapper {
-    margin: 12px 0 16px 0;
-    display: flex;
-    justify-content: center;
-}
-
-.btn-quick-start {
-    width: 100%;
-    max-width: 380px;
-    padding: 12px 24px;
-    font-size: 1.05rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #ff9100, #ff3d00);
-    box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
-    border-radius: 12px;
-    animation: pulseQuickBtn 2s infinite ease-in-out;
-}
-
-@keyframes pulseQuickBtn {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-}
-
-@keyframes cardAppear {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.badge {
-    background: linear-gradient(90deg, #e65100, #ff9800);
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    display: inline-block;
-    margin-bottom: 8px;
-}
-
-.dialog-card h1 {
-    font-size: 2.1rem;
-    color: #ffd700;
-    margin-bottom: 6px;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-}
-
-.dialog-card h2 {
-    font-size: 1.8rem;
-    color: #ffffff;
-    margin-bottom: 6px;
-}
-
-.subtitle {
-    font-size: 1rem;
-    color: #90caf9;
-    margin-bottom: 16px;
-}
-
-.story-box {
-    background: rgba(0, 0, 0, 0.4);
-    border-left: 4px solid #ffd700;
-    padding: 12px 16px;
-    border-radius: 8px;
-    text-align: left;
-    margin-bottom: 16px;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    color: #cfd8dc;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    text-align: left;
-    margin-bottom: 22px;
-}
-
-.feat {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.88rem;
-    color: #e0e0e0;
-}
-
-.feat-icon {
-    font-size: 1.6rem;
-}
-
-.card-footer {
-    display: flex;
-    justify-content: center;
-}
-
-/* Tugmalar */
-.btn {
-    border: none;
-    border-radius: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-large {
-    padding: 14px 34px;
-    font-size: 1.15rem;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #ff9800, #e65100);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(230, 81, 0, 0.4);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #ffa726, #f57c00);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 28px rgba(230, 81, 0, 0.6);
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #43a047, #1b5e20);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(27, 94, 32, 0.4);
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #4caf50, #2e7d32);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 28px rgba(46, 125, 50, 0.6);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #e53935, #b71c1c);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(183, 28, 28, 0.4);
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #f44336, #c62828);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 28px rgba(198, 40, 40, 0.6);
-}
-
-.celebrate-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    animation: bounceIcon 1.5s infinite;
-}
-
-@keyframes bounceIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-
-.stats-summary {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin: 14px 0 20px;
-}
-
-.stat-box {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.5);
-    border-radius: 12px;
-    padding: 10px 20px;
-    min-width: 140px;
-}
-
-.stat-title {
-    display: block;
-    font-size: 0.8rem;
-    color: #b0bec5;
-    margin-bottom: 4px;
-}
-
-.stat-value {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #ffd700;
-}
-
-.win-note {
-    font-size: 0.95rem;
-    color: #a5d6a7;
-    margin-bottom: 18px;
-}
-
-.hidden {
-    display: none !important;
-}
-
 /* ==========================================================
-   PUBG BATTLE ROYALE HUD VA QUROLLAR USLUBLARI
+   3. ULTRA-IXCHAM HUD (TOP HEADER) & BURGER MENU
    ========================================================== */
-.weapon-hud-box {
-    background: linear-gradient(135deg, rgba(20, 35, 60, 0.85), rgba(10, 20, 35, 0.85));
-    border: 1.5px solid #00e5ff;
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
-    gap: 8px;
-}
-
-.weapon-icon {
-    font-size: 1.3rem;
-    filter: drop-shadow(0 0 4px #00e5ff);
-}
-
-.weapon-name {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #80d8ff;
-    letter-spacing: 0.5px;
-}
-
-.ammo-display {
-    font-size: 1.15rem;
-    font-weight: 900;
-    color: #ffd600;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 2px 8px;
-    border-radius: 6px;
-    letter-spacing: 1px;
-    border: 1px solid rgba(255, 214, 0, 0.4);
-    min-width: 65px;
-    text-align: center;
-}
-
-/* PUBG Qurollar tanlash paneli (Pastki markaz) */
-.weapon-slots-bar {
+.hud-panel {
     position: absolute;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 18;
-    background: rgba(10, 20, 35, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1.5px solid rgba(100, 181, 246, 0.4);
-    border-radius: 12px;
-    padding: 6px 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-}
-
-.weapon-slot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1.5px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 5px 14px;
-    cursor: pointer;
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #b0bec5;
-    transition: all 0.18s ease;
-}
-
-.weapon-slot:hover {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: #64b5f6;
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.weapon-slot.active {
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.35), rgba(230, 81, 0, 0.5));
-    border-color: #ff9800;
-    color: #fff;
-    box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
-    transform: scale(1.05);
-}
-
-.weapon-slot.locked {
-    opacity: 0.5;
-    border-style: dashed;
-    border-color: rgba(255, 255, 255, 0.22);
-    cursor: default;
-    background: rgba(0, 0, 0, 0.3);
-}
-
-.weapon-slot.locked:hover {
-    transform: none;
-    background: rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.22);
-}
-
-/* Samalyot Parvoz Paneli */
-.flight-hud-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, rgba(2, 119, 189, 0.4), rgba(1, 87, 155, 0.6));
-    border: 1.5px solid #00e5ff;
-    border-radius: 10px;
-    padding: 4px 10px;
-    box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
-}
-
-.flight-icon {
-    font-size: 1.25rem;
-    animation: flightBob 1.6s infinite alternate ease-in-out;
-}
-
-@keyframes flightBob {
-    0% { transform: translateY(-2px); }
-    100% { transform: translateY(2px); }
-}
-
-.flight-value {
-    font-weight: 900;
-    color: #00e5ff;
-    font-family: monospace;
-    font-size: 0.95rem;
-}
-
-.slot-num {
-    background: #212121;
-    color: #ffb74d;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    border: 1px solid #ff9800;
-}
-
-/* PUBG Airdrop Banneri */
-.airdrop-alert {
-    position: absolute;
-    top: 75px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, rgba(183, 28, 28, 0.95), rgba(216, 67, 21, 0.95));
-    border: 2px solid #ff5252;
-    border-radius: 30px;
-    padding: 10px 28px;
-    color: #ffffff;
-    font-size: 1rem;
-    font-weight: 900;
-    box-shadow: 0 0 25px rgba(255, 82, 82, 0.8), 0 6px 20px rgba(0, 0, 0, 0.7);
-    z-index: 20;
-    animation: alertPulse 1.6s infinite alternate;
-}
-
-@keyframes alertPulse {
-    0% { transform: translateX(-50%) scale(0.98); box-shadow: 0 0 15px rgba(255, 82, 82, 0.5); }
-    100% { transform: translateX(-50%) scale(1.03); box-shadow: 0 0 30px rgba(255, 23, 68, 0.9); }
-}
-
-.alert-icon {
-    font-size: 1.6rem;
-}
-
-/* ==========================================================
-   SAVOLLAR VA QAYTA TIRILISH MODALI (REVIVAL QUIZ)
-   Matematika, Ingliz tili, Geografiya
-   ========================================================== */
-.quiz-card {
-    background: linear-gradient(145deg, #09192f, #050d1a);
-    border: 2px solid #00e5ff;
-    border-radius: 22px;
-    padding: 26px 32px;
-    max-width: 620px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 229, 255, 0.35);
-    animation: quizCardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes quizCardPop {
-    from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.quiz-badge {
-    background: linear-gradient(90deg, #00b0ff, #00e5ff);
-    color: #001e3c;
-    font-size: 0.85rem;
-    font-weight: 900;
-    padding: 5px 14px;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
-}
-
-.quiz-badge.badge-math {
-    background: linear-gradient(90deg, #00b0ff, #00e5ff);
-    color: #011627;
-}
-
-.quiz-badge.badge-english {
-    background: linear-gradient(90deg, #d500f9, #7c4dff);
-    color: #ffffff;
-}
-
-.quiz-badge.badge-geo {
-    background: linear-gradient(90deg, #00e676, #1de9b6);
-    color: #002e1b;
-}
-
-.quiz-badge.badge-flag {
-    background: linear-gradient(90deg, #ff9100, #ffd600);
-    color: #372000;
-}
-
-.quiz-title {
-    font-size: 1.75rem;
-    color: #ffffff;
-    margin: 4px 0;
-    text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-}
-
-/* Taymer */
-.quiz-timer-wrapper {
-    margin-bottom: 16px;
-    background: rgba(255, 255, 255, 0.04);
-    padding: 8px 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.quiz-timer-header {
+    top: 6px;
+    left: 10px;
+    right: 10px;
+    height: 34px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-    color: #b0bec5;
+    background: rgba(6, 18, 36, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 10px;
+    padding: 0 8px;
+    z-index: 30;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
-.timer-seconds {
+.hud-left-group, .hud-center-group, .hud-right-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Burger Button ☰ */
+.burger-btn {
+    background: linear-gradient(135deg, #00b0ff, #0081cb);
+    border: 1px solid #80d8ff;
+    color: #ffffff;
+    font-size: 1.15rem;
     font-weight: 900;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 176, 255, 0.5);
+    transition: transform 0.15s ease;
+}
+
+.burger-btn:active {
+    transform: scale(0.92);
+}
+
+.hud-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hearts-badge {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.coin-badge {
+    color: #ffd700;
+}
+
+.key-badge {
+    color: #80d8ff;
+}
+
+/* Markaziy pill (Qurol va transport ko'rsatkichlari) */
+.hud-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 2px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 229, 255, 0.35);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.weapon-hud-box {
+    border-color: #00e5ff;
+}
+
+.ammo-display {
     color: #ffd600;
-    font-size: 1.1rem;
+    font-family: monospace;
+    font-size: 0.88rem;
+    font-weight: 900;
+}
+
+.fuel-bar-container {
+    width: 50px;
+    height: 8px;
+    background: #111;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ff9800;
+}
+
+.fuel-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff3d00, #00e676);
+}
+
+.fuel-text {
+    font-size: 0.75rem;
+    color: #ffe082;
+}
+
+.flight-value {
+    color: #00e5ff;
     font-family: monospace;
 }
 
-.quiz-timer-bar-bg {
-    width: 100%;
-    height: 8px;
-    background: rgba(0, 0, 0, 0.6);
+/* Radar (Mini-map) va Fullscreen tugmasi */
+.radar-wrapper {
+    width: 30px;
+    height: 30px;
     border-radius: 6px;
     overflow: hidden;
+    border: 1px solid #00e5ff;
+    background: rgba(0, 15, 30, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
 }
 
-.quiz-timer-bar {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, #00e676, #ffd600, #ff1744);
-    border-radius: 6px;
-    transition: width 0.1s linear;
+.radar-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
-/* Savol maydoni */
-.quiz-question-box {
-    background: rgba(0, 20, 40, 0.65);
-    border: 1.5px solid rgba(0, 229, 255, 0.3);
-    border-radius: 14px;
-    padding: 16px 20px;
-    margin-bottom: 18px;
-    text-align: center;
-}
-
-.quiz-flag-visual {
-    font-size: 4.2rem;
-    line-height: 1;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-    animation: flagBounce 1.5s infinite alternate ease-in-out;
-}
-
-@keyframes flagBounce {
-    0% { transform: scale(0.96); }
-    100% { transform: scale(1.05); }
-}
-
-.quiz-flag-visual.hidden {
+.radar-label {
     display: none;
 }
 
-.quiz-question-text {
-    font-size: 1.35rem;
-    color: #ffffff;
-    font-weight: 700;
-    line-height: 1.4;
-    margin: 0;
-}
-
-/* Variantlar tugmalari */
-.quiz-options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.quiz-opt-btn {
-    background: linear-gradient(135deg, rgba(20, 45, 75, 0.9), rgba(10, 25, 45, 0.95));
-    border: 1.5px solid #2a5d8f;
-    border-radius: 12px;
-    padding: 12px 14px;
-    color: #e0e0e0;
-    font-size: 1.05rem;
-    font-weight: 700;
+.hud-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-align: left;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-.quiz-opt-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #1976d2, #0d47a1);
-    border-color: #64b5f6;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(33, 150, 243, 0.5);
-}
-
-.opt-key {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: #90caf9;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.opt-text {
-    flex: 1;
-}
-
-.quiz-opt-btn.correct {
-    background: linear-gradient(135deg, #00c853, #1b5e20) !important;
-    border-color: #69f0ae !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 25px rgba(0, 230, 118, 0.8) !important;
-    transform: scale(1.03);
-}
-
-.quiz-opt-btn.wrong {
-    background: linear-gradient(135deg, #d50000, #b71c1c) !important;
-    border-color: #ff5252 !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 25px rgba(255, 23, 68, 0.8) !important;
-    animation: wrongShake 0.4s ease;
-}
-
-@keyframes wrongShake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
-}
-
-/* Natija xabari */
-.quiz-feedback-box {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 1.05rem;
-    font-weight: 800;
-    margin-bottom: 14px;
-    animation: cardAppear 0.3s ease;
-}
-
-.quiz-feedback-box.correct {
-    background: rgba(0, 230, 118, 0.2);
-    border: 1.5px solid #00e676;
-    color: #69f0ae;
-}
-
-.quiz-feedback-box.wrong {
-    background: rgba(255, 23, 68, 0.2);
-    border: 1.5px solid #ff1744;
-    color: #ff8a80;
-}
-
-.quiz-feedback-box.hidden {
-    display: none;
-}
-
-.quiz-footer {
-    display: flex;
-    justify-content: center;
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #b0bec5;
-    padding: 8px 18px;
-    font-size: 0.88rem;
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.16);
-    color: #ffffff;
-}
-
-.btn-small {
-    padding: 8px 18px;
-    font-size: 0.85rem;
 }
 
 /* ==========================================================
-   MOBILE TELEFONLAR UCHUN MAXSUS TOUCH BOSHQARUV TIZIMI
+   4. BURGER DRAWER (SLIDE-OUT MENU)
+   ========================================================== */
+.burger-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+}
+
+.burger-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.burger-drawer-content {
+    position: relative;
+    width: 280px;
+    max-width: 75vw;
+    height: 100%;
+    background: linear-gradient(180deg, #091a32, #040d1c);
+    border-right: 1.5px solid #00e5ff;
+    padding: 16px;
+    box-shadow: 10px 0 35px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    overflow-y: auto;
+}
+
+.burger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.burger-header h3 {
+    font-size: 1rem;
+    color: #00e5ff;
+    font-weight: 900;
+}
+
+.burger-close-btn {
+    background: none;
+    border: none;
+    color: #ff5252;
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.drawer-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.drawer-lbl {
+    color: #90caf9;
+}
+
+.drawer-val {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.drawer-hr {
+    border: none;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 12px 0;
+}
+
+.drawer-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.drawer-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+/* ==========================================================
+   5. CONTROLLER TUGMALARI (LANDSCAPE LEFT & RIGHT)
    ========================================================== */
 .mobile-controls {
     position: absolute;
@@ -1231,21 +387,15 @@ kbd {
     z-index: 22;
 }
 
-.mobile-controls.hidden {
-    display: none !important;
-}
-
-/* Virtual Joystick */
+/* CHAP TOMON: Virtual Joystick */
 .joystick-zone {
     position: absolute;
-    bottom: 22px;
-    left: 20px;
-    width: 128px;
-    height: 128px;
+    bottom: 14px;
+    left: 22px;
+    width: 116px;
+    height: 116px;
     pointer-events: auto;
     touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1253,53 +403,42 @@ kbd {
 
 .joystick-base {
     position: relative;
-    width: 110px;
-    height: 110px;
+    width: 104px;
+    height: 104px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(14, 34, 59, 0.6) 0%, rgba(5, 15, 30, 0.8) 100%);
-    border: 2px solid rgba(0, 229, 255, 0.5);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle, rgba(10, 30, 55, 0.6) 0%, rgba(3, 12, 24, 0.85) 100%);
+    border: 2px solid rgba(0, 229, 255, 0.45);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.3), inset 0 0 12px rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.joystick-base::after {
-    content: '';
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 1px dashed rgba(255, 255, 255, 0.25);
-}
-
 .joystick-thumb {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: radial-gradient(circle, #00e5ff 0%, #0288d1 75%, #01579b 100%);
     border: 2px solid #ffffff;
-    box-shadow: 0 0 16px rgba(0, 229, 255, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.8);
     pointer-events: none;
     will-change: transform;
     transform: translate(0px, 0px);
 }
 
-/* O'ng tomon Action tugmalari */
+/* O'NG TOMON: Ergonomik Controller Tugmalari Klasteri */
 .mobile-actions-wrapper {
     position: absolute;
-    bottom: 16px;
-    right: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
+    bottom: 12px;
+    right: 18px;
+    width: 190px;
+    height: 175px;
     pointer-events: none;
-    z-index: 23;
 }
 
 .touch-btn {
+    position: absolute;
     pointer-events: auto;
     touch-action: none;
     border: none;
@@ -1312,388 +451,629 @@ kbd {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.08s ease, filter 0.08s ease, background 0.15s ease;
+    transition: transform 0.08s ease, filter 0.08s ease;
 }
 
 .touch-btn:active {
-    transform: scale(0.92);
-    filter: brightness(1.25);
+    transform: scale(0.91);
+    filter: brightness(1.3);
 }
 
-/* Katta O't Ochish Tugmasi (Fire Button) */
+/* Katta O't Ochish Tugmasi */
 .btn-fire {
-    width: 72px;
-    height: 72px;
+    bottom: 8px;
+    right: 8px;
+    width: 66px;
+    height: 66px;
     border-radius: 50%;
     background: radial-gradient(circle, #ff5722 0%, #d84315 70%, #bf360c 100%);
     border: 2.5px solid #ffab91;
     box-shadow: 0 0 25px rgba(255, 87, 34, 0.8), 0 4px 12px rgba(0, 0, 0, 0.7);
     color: #ffffff;
-    position: relative;
 }
 
 .btn-fire .touch-btn-icon {
-    font-size: 1.55rem;
+    font-size: 1.5rem;
     line-height: 1;
 }
 
 .btn-fire .touch-btn-label {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 900;
     letter-spacing: 0.8px;
-    margin-top: 1px;
 }
 
-.btn-fire-ring {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 1.5px dashed rgba(255, 171, 145, 0.5);
-    animation: rotateRing 8s linear infinite;
-}
-
-@keyframes rotateRing {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Yumaloq Sakrash va Amal tugmalari */
-.action-btn-row {
-    display: flex;
-    gap: 12px;
-    pointer-events: none;
-}
-
-.btn-circle {
-    width: 52px;
-    height: 52px;
+/* Sakrash Tugmasi */
+.btn-jump {
+    bottom: 86px;
+    right: 12px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: radial-gradient(circle, #00b0ff 0%, #0277bd 80%);
     border: 2px solid #80d8ff;
-    box-shadow: 0 0 14px rgba(0, 176, 255, 0.5), 0 3px 8px rgba(0,0,0,0.6);
+    box-shadow: 0 0 14px rgba(0, 176, 255, 0.5);
     color: #fff;
-}
-
-.btn-circle .touch-btn-icon {
     font-size: 1.25rem;
-    line-height: 1;
-}
-
-.btn-circle .touch-btn-label {
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    margin-top: 1px;
 }
 
 /* Amal (E) Tugmasi */
 .btn-action {
+    bottom: 12px;
+    right: 90px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     background: radial-gradient(circle, #ffd600 0%, #ff8f00 80%);
-    border-color: #fff9c4;
+    border: 2px solid #fff9c4;
     color: #000;
-    box-shadow: 0 0 16px rgba(255, 214, 0, 0.6), 0 3px 8px rgba(0,0,0,0.6);
+    box-shadow: 0 0 16px rgba(255, 214, 0, 0.6);
 }
 
 .btn-action.active-pulse {
-    animation: pulseActionBtn 1s infinite alternate ease-in-out;
+    animation: pulseAction 1s infinite alternate;
 }
 
-@keyframes pulseActionBtn {
-    0% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 214, 0, 0.6); }
+@keyframes pulseAction {
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 214, 0, 0.6); }
     100% { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 214, 0, 1); }
 }
 
-/* Kichik Yordamchi Tugmalar (O'qlash, Cho'pak, Yugurish) */
-.action-btn-row-sub {
-    display: flex;
-    gap: 8px;
-    pointer-events: none;
+.touch-btn-label-sub {
+    font-size: 0.55rem;
+    font-weight: 900;
 }
 
-.btn-sub {
-    background: rgba(10, 25, 47, 0.88);
-    backdrop-filter: blur(6px);
-    border: 1.5px solid rgba(64, 153, 255, 0.45);
-    border-radius: 9px;
-    padding: 6px 8px;
-    min-width: 52px;
-    color: #e0e0e0;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+/* Yordamchi Tugmalar (O'qlash, Cho'pak, Yugurish) */
+.btn-action-small {
+    border-radius: 50%;
+    background: rgba(10, 25, 47, 0.9);
+    border: 1.5px solid rgba(64, 153, 255, 0.5);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-.btn-sub .touch-btn-icon {
-    font-size: 1.05rem;
-    line-height: 1;
+.btn-reload {
+    bottom: 74px;
+    right: 76px;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
 }
 
-.btn-sub .touch-btn-label {
-    font-size: 0.6rem;
+.btn-throw {
+    bottom: 124px;
+    right: 76px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+}
+
+.btn-sprint {
+    bottom: 140px;
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+}
+
+.touch-btn-label-tiny {
+    font-size: 0.5rem;
     font-weight: 800;
-    margin-top: 2px;
 }
 
 .btn-sprint.active {
     background: linear-gradient(135deg, #00c853, #1b5e20);
     border-color: #69f0ae;
-    color: #ffffff;
-    box-shadow: 0 0 14px rgba(0, 230, 118, 0.7);
+    box-shadow: 0 0 12px rgba(0, 230, 118, 0.7);
 }
 
-/* Parvoz va Transport maxsus barlari */
-.mobile-flight-bar, .mobile-vehicle-bar {
+/* Parvoz va Transport maxsus tugmalari */
+.mobile-flight-bar {
     position: absolute;
-    top: 55px;
+    top: 48px;
     left: 20px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     pointer-events: auto;
-    z-index: 23;
 }
 
-.btn-flight {
-    background: linear-gradient(135deg, rgba(2, 119, 189, 0.9), rgba(1, 87, 155, 0.9));
+.mobile-vehicle-bar {
+    position: absolute;
+    top: 48px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.btn-flight, .btn-vehicle {
+    background: rgba(2, 119, 189, 0.85);
     border: 1.5px solid #00e5ff;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.75rem;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.7rem;
     font-weight: 900;
     color: #fff;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
-}
-
-.btn-vehicle {
-    background: linear-gradient(135deg, rgba(230, 81, 0, 0.9), rgba(191, 54, 12, 0.9));
-    border: 1.5px solid #ffb74d;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: #fff;
-    box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
 }
 
 /* ==========================================================
-   RESPONSIV MOSLASHUV (TELEFONLAR VA PLANSHETLAR)
+   6. PASTKI QUROLLAR PANELI (MINIMALIST BAR)
    ========================================================== */
-@media (max-width: 768px) {
-    .game-wrapper {
-        padding: 4px 6px;
-    }
-
-    /* HUD mobile strip */
-    .hud-panel {
-        padding: 4px 6px;
-        gap: 4px;
-        border-radius: 8px;
-        font-size: 0.72rem;
-        margin-bottom: 2px;
-        justify-content: flex-start;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        flex-wrap: nowrap;
-    }
-    .hud-panel::-webkit-scrollbar {
-        display: none;
-    }
-    .hud-item {
-        padding: 3px 6px;
-        gap: 4px;
-        border-radius: 6px;
-        flex-shrink: 0;
-    }
-    .hud-label {
-        font-size: 0.65rem;
-    }
-    .hud-value {
-        font-size: 0.82rem;
-    }
-    .hearts {
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-    }
-    .weapon-hud-box {
-        padding: 3px 6px;
-    }
-    .ammo-display {
-        font-size: 0.82rem;
-        padding: 1px 4px;
-        min-width: 44px;
-    }
-    .weapon-name {
-        display: none;
-    }
-
-    /* Radar mobile scale */
-    .radar-wrapper {
-        top: 44px;
-        right: 6px;
-        width: 86px;
-        height: 86px;
-        border-width: 1.5px;
-    }
-    .radar-wrapper canvas {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .radar-label {
-        font-size: 0.58rem;
-    }
-
-    /* Weapon slots bar on mobile */
-    .weapon-slots-bar {
-        bottom: 8px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 3px 6px;
-        gap: 4px;
-        max-width: 96vw;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-    }
-    .weapon-slots-bar::-webkit-scrollbar {
-        display: none;
-    }
-    .weapon-slot {
-        padding: 4px 8px;
-        font-size: 0.75rem;
-        border-radius: 6px;
-        flex-shrink: 0;
-    }
-    .slot-num {
-        display: none;
-    }
-
-    /* Modals dialog cards on mobile */
-    .dialog-card {
-        padding: 16px 14px;
-        border-radius: 14px;
-        margin: 10px auto 40px auto;
-    }
-    .dialog-card h1 {
-        font-size: 1.35rem;
-        line-height: 1.25;
-    }
-    .dialog-card h2 {
-        font-size: 1.22rem;
-    }
-    .subtitle {
-        font-size: 0.82rem;
-        margin-bottom: 10px;
-    }
-    .story-box {
-        padding: 8px 10px;
-        font-size: 0.8rem;
-        margin-bottom: 12px;
-    }
-    .features-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-bottom: 14px;
-    }
-    .feat {
-        padding: 6px 10px;
-        font-size: 0.78rem;
-        gap: 8px;
-    }
-    .feat-icon {
-        font-size: 1.2rem;
-    }
-    .btn-large {
-        padding: 12px 20px;
-        font-size: 0.95rem;
-        width: 100%;
-    }
-
-    /* Quiz card mobile */
-    .quiz-card {
-        padding: 14px 12px;
-        border-radius: 14px;
-    }
-    .quiz-title {
-        font-size: 1.25rem;
-    }
-    .quiz-flag-visual {
-        font-size: 3rem;
-    }
-    .quiz-question-text {
-        font-size: 1.1rem;
-    }
-    .quiz-options-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-    .quiz-opt-btn {
-        padding: 10px 12px;
-        font-size: 0.95rem;
-        min-height: 48px;
-    }
-
-    /* Hide keyboard footer on mobile */
-    .footer-help {
-        display: none !important;
-    }
-
-    /* Tree status & Airdrop alerts mobile sizing */
-    .tree-status {
-        top: 48px;
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        max-width: 90vw;
-    }
-    .airdrop-alert {
-        top: 50px;
-        font-size: 0.78rem;
-        padding: 6px 14px;
-        max-width: 90vw;
-    }
-
-    /* Lock prompt: always hide on mobile */
-    .lock-prompt {
-        display: none !important;
-    }
+.weapon-slots-bar {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    background: rgba(6, 18, 36, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(100, 181, 246, 0.35);
+    border-radius: 8px;
+    padding: 2px 6px;
+    z-index: 24;
 }
 
-/* Landscape mobile optimization */
-@media (max-height: 500px) and (orientation: landscape) {
-    .hud-panel {
-        padding: 2px 6px;
-        font-size: 0.65rem;
-    }
-    .joystick-zone {
-        bottom: 10px;
-        left: 10px;
-        width: 105px;
-        height: 105px;
-    }
-    .joystick-base {
-        width: 95px;
-        height: 95px;
-    }
-    .joystick-thumb {
-        width: 42px;
-        height: 42px;
-    }
-    .mobile-actions-wrapper {
-        bottom: 8px;
-        right: 10px;
-        gap: 6px;
-    }
-    .btn-fire {
-        width: 58px;
-        height: 58px;
-    }
-    .btn-circle {
-        width: 44px;
-        height: 44px;
-    }
-    .weapon-slots-bar {
-        bottom: 4px;
-    }
-    .radar-wrapper {
-        width: 72px;
-        height: 72px;
-        top: 36px;
-    }
+.weapon-slot {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 3px 7px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #b0bec5;
+}
+
+.weapon-slot.active {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.45), rgba(230, 81, 0, 0.65));
+    border-color: #ff9800;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+}
+
+.weapon-slot.locked {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.slot-num {
+    display: none;
+}
+
+/* ==========================================================
+   7. MINIMALIST POPUP DIALOGLAR (100% EKRANGA SIG'ADI)
+   Hech qachon buttonlar ekran tashqarisida qolmaydi
+   ========================================================== */
+.overlay-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 14, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.overlay-screen.hidden {
+    display: none !important;
+}
+
+.minimal-card {
+    background: linear-gradient(145deg, #0e223b, #071324);
+    border: 2px solid #00e5ff;
+    border-radius: 16px;
+    padding: 16px 24px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 85vh;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 229, 255, 0.3);
+    text-align: center;
+    animation: cardPop 0.3s ease-out;
+}
+
+@keyframes cardPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.minimal-badge {
+    background: linear-gradient(90deg, #ff9100, #ff3d00);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.minimal-title {
+    font-size: 1.35rem;
+    color: #ffd700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.minimal-pills {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.minimal-pills span {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #e0e0e0;
+}
+
+.minimal-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.minimal-icon {
+    font-size: 2.2rem;
+    margin-bottom: 4px;
+}
+
+.minimal-note {
+    font-size: 0.8rem;
+    color: #90caf9;
+    margin-bottom: 10px;
+}
+
+/* Tugmalar */
+.btn {
+    border: none;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-large {
+    padding: 10px 24px;
+    font-size: 0.95rem;
+}
+
+.btn-glow {
+    background: linear-gradient(135deg, #ff9100, #ff3d00);
+    color: #fff;
+    box-shadow: 0 0 25px rgba(255, 87, 34, 0.8);
+    animation: btnPulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes btnPulse {
+    0% { transform: scale(0.98); box-shadow: 0 0 15px rgba(255, 87, 34, 0.5); }
+    100% { transform: scale(1.02); box-shadow: 0 0 28px rgba(255, 87, 34, 0.9); }
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff9800, #e65100);
+    color: #fff;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #43a047, #1b5e20);
+    color: #fff;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #b0bec5;
+}
+
+.btn-small {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+}
+
+/* ==========================================================
+   8. MINIMALIST REVIVAL QUIZ MODAL (LANDSCAPE)
+   ========================================================== */
+.minimal-quiz-card {
+    background: linear-gradient(145deg, #09192f, #050d1a);
+    border: 2px solid #00e5ff;
+    border-radius: 16px;
+    padding: 12px 18px;
+    max-width: 520px;
+    width: 90%;
+    max-height: 88vh;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 229, 255, 0.35);
+    text-align: center;
+}
+
+.quiz-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.quiz-badge {
+    background: #00e5ff;
+    color: #001e3c;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.quiz-title-mini {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.quiz-timer-inline {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #ffd600;
+    font-family: monospace;
+}
+
+.quiz-timer-bar-bg {
+    width: 100%;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.quiz-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00e676, #ffd600, #ff1744);
+    border-radius: 4px;
+}
+
+.quiz-question-box-mini {
+    background: rgba(0, 20, 40, 0.6);
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.quiz-flag-visual {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.quiz-question-text {
+    font-size: 1.05rem;
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.quiz-options-grid-landscape {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.quiz-opt-btn {
+    background: linear-gradient(135deg, rgba(20, 45, 75, 0.9), rgba(10, 25, 45, 0.95));
+    border: 1.5px solid #2a5d8f;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #e0e0e0;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+}
+
+.quiz-opt-btn:active {
+    background: linear-gradient(135deg, #1976d2, #0d47a1);
+}
+
+.opt-key {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.72rem;
+    color: #90caf9;
+}
+
+.quiz-feedback-box {
+    padding: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.quiz-feedback-box.correct { color: #69f0ae; }
+.quiz-feedback-box.wrong { color: #ff8a80; }
+
+/* ==========================================================
+   9. EKRAN OVERLAY EFFEKTLARI (IN-GAME FX)
+   ========================================================== */
+.damage-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, transparent 40%, rgba(220, 20, 20, 0.6) 85%, rgba(180, 0, 0, 0.85) 100%);
+    opacity: 0;
+    transition: opacity 0.12s ease-out;
+    z-index: 10;
+}
+
+.lava-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, transparent 45%, rgba(255, 87, 34, 0.4) 85%, rgba(216, 27, 96, 0.7) 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    z-index: 9;
+}
+
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 15;
+}
+
+.cross-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3px;
+    height: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #000;
+}
+
+.cross-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 2px #000;
+}
+.cross-top { top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 6px; }
+.cross-bottom { bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 6px; }
+.cross-left { left: 0; top: 50%; transform: translateY(-50%); height: 2px; width: 6px; }
+.cross-right { right: 0; top: 50%; transform: translateY(-50%); height: 2px; width: 6px; }
+
+.hit-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    color: #ff1744;
+    font-size: 1.4rem;
+    font-weight: 900;
+    pointer-events: none;
+    transition: transform 0.08s ease;
+}
+
+.hit-marker.show {
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+.action-prompt {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(5, 15, 30, 0.85);
+    border: 1px solid #ffd700;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #ffd700;
+    z-index: 18;
+    pointer-events: none;
+}
+
+.action-key {
+    background: #ffd700;
+    color: #000;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+}
+
+.tree-status {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(46, 125, 50, 0.85);
+    border: 1px solid #81c784;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.72rem;
+    font-weight: bold;
+    z-index: 18;
+}
+
+.airdrop-alert {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(183, 28, 28, 0.9), rgba(216, 67, 21, 0.9));
+    border: 1.5px solid #ff5252;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    z-index: 19;
+    animation: alertPulse 1.5s infinite alternate;
+}
+
+@keyframes alertPulse {
+    0% { transform: translateX(-50%) scale(0.97); }
+    100% { transform: translateX(-50%) scale(1.03); }
+}
+
+.game-notification {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #00e5ff;
+    border-radius: 12px;
+    padding: 5px 16px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #00e5ff;
+    z-index: 21;
+    pointer-events: none;
+}
+
+.lock-prompt {
+    display: none !important;
+}
+
+.hidden {
+    display: none !important;
 }

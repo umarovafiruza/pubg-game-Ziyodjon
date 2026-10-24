@@ -138,7 +138,14 @@ const btnFlightPitchDown = document.getElementById('btnFlightPitchDown');
 const mobileVehicleControls = document.getElementById('mobileVehicleControls');
 const btnVehicleHorn = document.getElementById('btnVehicleHorn');
 const btnVehicleExit = document.getElementById('btnVehicleExit');
-const quickStartBtn = document.getElementById('quickStartBtn');
+
+// Burger menyu DOM elementlari
+const burgerMenuBtn = document.getElementById('burgerMenuBtn');
+const burgerDrawer = document.getElementById('burgerDrawer');
+const burgerCloseBtn = document.getElementById('burgerCloseBtn');
+const burgerBackdrop = document.getElementById('burgerBackdrop');
+const drawerFullscreenBtn = document.getElementById('drawerFullscreenBtn');
+const drawerRestartBtn = document.getElementById('drawerRestartBtn');
 
 // PUBG Qurollar tizimi (Kengaytirilgan Arsenal)
 let activeWeapon = 'rifle'; // 'sword' | 'rifle' | 'ak47' | 'sniper' | 'shotgun' | 'stick'
@@ -3389,17 +3396,55 @@ function setupControls() {
     if (soundToggleBtn) soundToggleBtn.addEventListener('click', toggleSound);
     if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-    if (startBtn) startBtn.addEventListener('click', startGame);
-    if (quickStartBtn) {
-        quickStartBtn.addEventListener('click', startGame);
-        quickStartBtn.addEventListener('touchstart', (e) => {
+    // Burger menyu hodisalari
+    if (burgerMenuBtn && burgerDrawer) {
+        burgerMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            burgerDrawer.classList.remove('hidden');
+        });
+        burgerMenuBtn.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
             e.preventDefault();
-            startGame();
+            burgerDrawer.classList.remove('hidden');
         });
     }
-    if (nextLevelBtn) nextLevelBtn.addEventListener('click', goToNextLevel);
-    if (winRestartBtn) winRestartBtn.addEventListener('click', restartFromBeginning);
-    if (gameOverRestartBtn) gameOverRestartBtn.addEventListener('click', restartFromBeginning);
+    if (burgerCloseBtn && burgerDrawer) {
+        burgerCloseBtn.addEventListener('click', () => burgerDrawer.classList.add('hidden'));
+        burgerCloseBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            burgerDrawer.classList.add('hidden');
+        });
+    }
+    if (burgerBackdrop && burgerDrawer) {
+        burgerBackdrop.addEventListener('click', () => burgerDrawer.classList.add('hidden'));
+        burgerBackdrop.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            burgerDrawer.classList.add('hidden');
+        });
+    }
+    if (drawerFullscreenBtn) {
+        drawerFullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+    if (drawerRestartBtn) {
+        drawerRestartBtn.addEventListener('click', () => {
+            if (burgerDrawer) burgerDrawer.classList.add('hidden');
+            restartFromBeginning();
+        });
+    }
+
+    const bindTouchClick = (elem, fn) => {
+        if (!elem) return;
+        elem.addEventListener('click', fn);
+        elem.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            fn();
+        });
+    };
+
+    bindTouchClick(startBtn, startGame);
+    bindTouchClick(nextLevelBtn, goToNextLevel);
+    bindTouchClick(winRestartBtn, restartFromBeginning);
+    bindTouchClick(gameOverRestartBtn, restartFromBeginning);
     if (quizGiveUpBtn) quizGiveUpBtn.addEventListener('click', () => handleQuizAnswer(-2));
 
     // Mobile sensorli boshqaruvni ishga tushirish
@@ -4480,8 +4525,8 @@ function updateCollectiblesAndPrompts() {
 }
 
 function updateRadar() {
-    if (!radarCtx) return;
-    const size = 140;
+    if (!radarCtx || !radarCanvas) return;
+    const size = radarCanvas.width || 80;
     const center = size / 2;
     const scale = (size / 2) / 280;
 
@@ -4659,6 +4704,21 @@ function updateHUD() {
             ammoDisplayElem.innerText = `${shotgunAmmo} / ${shotgunReserve}`;
         }
     }
+
+    if (fuelBoxElem && flightHudBox) {
+        if (isDriving) {
+            if (drivingVehicleType === 'plane') {
+                flightHudBox.classList.remove('hidden');
+                fuelBoxElem.classList.add('hidden');
+            } else {
+                fuelBoxElem.classList.remove('hidden');
+                flightHudBox.classList.add('hidden');
+            }
+        } else {
+            fuelBoxElem.classList.add('hidden');
+            flightHudBox.classList.add('hidden');
+        }
+    }
 }
 
 function showNotification(text) {
@@ -4671,11 +4731,30 @@ function showNotification(text) {
     }, 2800);
 }
 
+function requestFullscreenAndLandscape() {
+    const el = document.documentElement;
+    if (!document.fullscreenElement) {
+        const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        if (rfs) {
+            rfs.call(el).then(() => {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                }
+            }).catch(() => {});
+        }
+    } else {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+        }
+    }
+}
+
 // ----------------------------------------------------------
 // 16. O'YINNI BOSHLASH VA BOSQICHLARNI BOSHQARISH
 // ----------------------------------------------------------
 function startGame() {
     getAudioContext();
+    requestFullscreenAndLandscape();
     if (startScreen) startScreen.classList.add('hidden');
     currentLevel = 1;
     playerHealth = 3;
@@ -5085,9 +5164,9 @@ function toggleSound() {
 
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        requestFullscreenAndLandscape();
     } else {
-        document.exitFullscreen().catch(() => {});
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
     }
 }
 
